@@ -1,18 +1,12 @@
 #!/usr/bin/env python
 import re
 
-from jinja2 import Markup
+from jinja2 import evalcontextfilter, Markup
 from flask import Flask
 import gmail_api
-import logging
 
 
-app = Flask(__name__)
-
-if __name__ == "__main__":
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
+application = Flask(__name__)
 
 
 def linebreaks(value):
@@ -34,7 +28,7 @@ def linebreaks(value):
     return Markup(paras)
 
 
-@app.route('/')
+@application.route('/')
 def read_log_file():
     # api = gmail_api.gapi()
     # print 'initialized api, stopping any current watchers'
@@ -58,7 +52,7 @@ def read_log_file():
 
 
 def start():
-    print 'initializing api'
+    #     print 'initializing api'
     #     api = gmail_api.gapi()
     #     print 'initialized api, stopping any current watchers'
     #     api.stop()
@@ -81,15 +75,15 @@ def start():
     #     instance.watch()
 
 
-if __name__ == '__main__':
+    # if __name__ == '__main__':
     #     app.run()
     # api = gmail_api.gapi()
     print 'starting'
     gmail_api.gapi()
     print 'initialized api, stopping any current watchers'
-    app.run(host='0.0.0.0', port=1337)
     # api.stop()
     # print 'finished stop, starting subscribe'
     # subscribe_to_pubsub_topic(api)
     # watch_for_email(api)
     # # # app.run(host='0.0.0.0', port=1337,/ debug=True)
+    # # application.run(host='0.0.0.0', port=1337)

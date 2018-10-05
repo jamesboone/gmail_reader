@@ -159,19 +159,26 @@ class gapi(object):
         self.get_mail(message.data)
 
     def sub_to_topic(self):
+        print 'starting sub_to_topic'
         topic_name = 'projects/{project_id}/topics/{topic}'.format(
             project_id=PROJECT_ID,
             topic='new_email',
         )
+        print 'var\'d topic'
         subscription_name = 'projects/{project_id}/subscriptions/{sub}'.format(
             project_id=PROJECT_ID,
             sub='sub_new_email_v1',
         )
-        try:
-            self.subscriber.create_subscription(
-                name=subscription_name, topic=topic_name)
-        except google_exceptions.AlreadyExists:
-            pass
+        print 'var\'d sub name'
+        # try:
+        #     print 'creating sub'
+        #     self.subscriber.create_subscription(
+        #         name=subscription_name, topic=topic_name)
+        #     print 'finished sub'
+        # except google_exceptions.AlreadyExists:
+        #     print 'already exists error, passing'
+        #     pass
+        print 'adding visual starting'
         print '\n', '=' * 30, 'Starting', '=' * 30, '\n'
         print 'Subscribing to new callback'
         self.subscriber.subscribe(subscription_name, self.callback)
@@ -193,9 +200,13 @@ class gapi(object):
         print '\nSetting first history point: ', self.history
 
 
-# if __name__ == '__main__':
-#     api = gapi()
-#     api.sub_to_topic()
-#     api.stop()
-#     api.watch()
-#     print 'watching'
+def start():
+    api = gapi()
+    api.sub_to_topic()
+    api.stop()
+    api.watch()
+    print 'watching'
+
+
+if __name__ == '__main__':
+    start()
