@@ -18,7 +18,7 @@ def linebreaks(value):
     try:
         paras = [u'<p>%s</p>' % p.encode('ascii', errors='ignore').replace('\n', '<br />') for p in paras]
     except Exception, e:
-        logger.error('Exception: '.format(e))
+        logger.error('Exception: {}'.format(e))
         pass
     try:
         paras = u'\n\n'.join(paras)

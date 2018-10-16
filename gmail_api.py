@@ -3,7 +3,6 @@
 import os
 import json
 import base64
-import ipdb
 import ssl
 import requests
 
@@ -51,26 +50,31 @@ class gapi(object):
             try:
                 if self.is_first_email:
                     if not self.history and isinstance(message, str):
-                        logger.debug('History ID not set from watch response, using subscriber message: {}'.format(message))
+                        logger.debug('History ID not set from watch response, using subscriber \
+                            message: {}'.format(message))
                         self.history_id = json.loads(message).get('historyId', {})
                         logger.debug('History Id set as: {}'.format(self.history_id))
                     else:
                         self.history_id = self.history.get('historyId', {})
-                        logger.debug('First history id found setting self.history_id: {}'.format(self.history_id))
+                        logger.debug('First history id found setting self.history_id: {}'.format(
+                            self.history_id))
                     self.is_first_email = False
                 else:
-                    logger.debug('First email ALREADY found, using last self.history_id: {}'.format(self.history_id))
+                    logger.debug('First email ALREADY found, using last self.history_id: \
+                        {}'.format(self.history_id))
             except Exception, e:
                 logger.error('Exception found: {}'.format(e))
                 pass
             if self.history_id:
-                messages = self.service.history().list(userId=EMAIL, startHistoryId=self.history_id).execute()
-                logger.debug('From the last history id: {}, new history ids have come in: {}: '.format(self.history_id, messages))
+                messages = self.service.history().list(
+                    userId=EMAIL, startHistoryId=self.history_id).execute()
+                logger.debug('From the last history id: {}, new history ids have come in: {}\
+                    '.format(self.history_id, messages))
                 if isinstance(messages, list):
                     logger.debug('Messages var is a list and expected a dict')
-                    ipdb.set_trace()
                 if messages.get('history', []):
-                    logger.debug('Message var is a dict as expected and the message history is: {}'.format(messages['history']))
+                    logger.debug('Message var is a dict as expected and the message history is: {}\
+                        '.format(messages['history']))
                     if isinstance(messages['history'], list):
                         logger.debug('Messages history -1 is: {}'.format(messages['history'][-1]))
                     if messages['history'][-1].get('messages', []):
@@ -81,19 +85,24 @@ class gapi(object):
                             pass
                         if message_id and message_id != self.last_message_id:
                             self.last_message_id = message_id
-                            logger.debug('The message history messages Id is: {}'.format(messages['history'][-1]['messages'][0]['id']))
-                            raw_email = self.service.messages().get(userId=EMAIL, id=message_id).execute()
+                            logger.debug('The message history messages Id is: {}'.format(
+                                messages['history'][-1]['messages'][0]['id']))
+                            raw_email = self.service.messages().get(
+                                userId=EMAIL, id=message_id).execute()
                             if raw_email:
                                 logger.debug('Raw email val: {}'.format(raw_email))
                             else:
                                 logger.error('No raw email found when there should have been one.')
                         else:
-                            logger.debug('This message was already processed, skipping this message, \
-                                current history id: {} - current message details: {}'.format(self.history_id, messages))
+                            logger.debug('This message was already processed, skipping this \
+                                message, current history id: {} - current message details: {}\
+                                '.format(self.history_id, messages))
                     else:
-                        logger.error('No message was found when getting: "messages[\'history\'][0].get(\'messages\')"')
+                        logger.error('No message was found when getting: \
+                            "messages[\'history\'][0].get(\'messages\')"')
                 elif messages.get('historyId', []):
-                    logger.debug('New historyid detected, replacing old self.history_id({}) with new: {}'.format(self.history_id, messages['historyId']))
+                    logger.debug('New historyid detected, replacing old self.history_id({}) with \
+                        new: {}'.format(self.history_id, messages['historyId']))
                     self.history_id = messages['historyId']
                 if raw_email:
                     has_attachment = False
@@ -158,22 +167,10 @@ class gapi(object):
 
     def sub_to_topic(self):
         logger.debug('Starting sub_to_topic')
-        # topic_name = 'projects/{project_id}/topics/{topic}'.format(
-        #     project_id=PROJECT_ID,
-        #     topic='new_email',
-        # )
         subscription_name = 'projects/{project_id}/subscriptions/{sub}'.format(
             project_id=PROJECT_ID,
             sub='sub_new_email_v1',
         )
-        # try:
-        #     logger.debug('creating sub')
-        #     self.subscriber.create_subscription(
-        #         name=subscription_name, topic=topic_name)
-        #     logger.debug('finished sub')
-        # except google_exceptions.AlreadyExists:
-        #     logger.debug('already exists error, passing')
-        #     pass
         logger.debug('{}{}{}{}{}'.format('\n', '=' * 30, 'Starting', '=' * 30, '\n'))
         logger.debug('Subscribing to new callback')
         self.subscriber.subscribe(subscription_name, self.callback)
